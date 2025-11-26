@@ -1,0 +1,19 @@
+{
+  "name": "jira-confluence",
+  "version": "1.0.0",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "commander": "^14.0.2",
+    "confluence.js": "^2.1.0",
+    "dotenv": "^17.2.3",
+    "jira.js": "^5.2.2",
+    "yaml": "^2.8.1"
+  }
+}
