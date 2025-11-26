@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 
-const { Command } = require('commander');
+import { Command } from 'commander';
 
-const { loadEnv } = require('./lib/env');
-const { handleError } = require('./lib/error');
-const {
+import { loadEnv } from './lib/env.js';
+import { handleError } from './lib/error.js';
+import {
   handleJiraCreate,
   handleJiraGet,
   handleJiraSearch,
   handleJiraUpdate,
-} = require('./lib/jira/handlers');
-const {
+} from './lib/jira/handlers.js';
+import {
   handleConfluenceCreate,
   handleConfluenceRead,
   handleConfluenceUpdate,
-} = require('./lib/confluence');
+} from './lib/confluence/index.js';
 
 loadEnv();
 
