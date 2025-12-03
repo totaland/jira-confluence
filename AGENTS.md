@@ -83,6 +83,36 @@ bun cli.ts <command>
 
   # Simple text search
   node dist/cli.js jira-search --text "authentication" --limit 10
+
+  # Find issue by key
+  node dist/cli.js jira-search --jql "key = CYMATE-66"
+  ```
+
+- **Skill: get-jira-issue**
+  ```bash
+  # Read a specific issue by key
+  node dist/cli.js jira-get CYMATE-66
+
+  # Get full JSON payload
+  node dist/cli.js jira-get CYMATE-66 --json
+
+  # Get condensed LLM-friendly summary
+  node dist/cli.js jira-get CYMATE-66 --llm
+  ```
+
+- **Skill: search-then-read-jira**
+  When user asks about Jira issues but doesn't provide a key:
+  1. Search first: `node dist/cli.js jira-search --text "<query>" --limit 10`
+  2. Read the relevant issue: `node dist/cli.js jira-get <ISSUE-KEY>`
+
+  Example workflow:
+  ```bash
+  # User asks: "find issues about authentication"
+  node dist/cli.js jira-search --text "authentication" --limit 10
+  # Output: CYMATE-42, CYMATE-55, ...
+  
+  # Then read the relevant one
+  node dist/cli.js jira-get CYMATE-42
   ```
 
 - **Skill: transition-jira-issue**
