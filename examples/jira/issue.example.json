@@ -1,0 +1,15 @@
+{
+  "project": "PROJ",
+  "issueType": "Story",
+  "summary": "Implement user authentication",
+  "description": "As a user, I want to be able to log in so that I can access protected resources.",
+  "assignee": "john.doe",
+  "priority": "High",
+  "labels": ["authentication", "security"],
+  "epic": "PROJ-100",
+  "acceptance": "- Given a valid username and password, when I submit the login form, then I should be redirected to the dashboard.\n- Given an invalid password, when I submit the login form, then I should see an error message.",
+  "storyPoints": 5,
+  "customFields": {
+    "customfield_10001": "Sprint 5"
+  }
+}

@@ -1,0 +1,184 @@
+<ac:structured-macro ac:name="info" ac:schema-version="1"><ac:rich-text-body><p>A Node.js CLI tool for automating Jira and Confluence operations, designed for use by LLM agents and developers.</p></ac:rich-text-body></ac:structured-macro>
+
+<h2>Overview</h2>
+<p>The <strong>jira-confluence</strong> CLI provides commands to create, read, update, and search Jira issues and Confluence pages directly from the command line. It supports:</p>
+<ul>
+<li>Creating Jira issues from Markdown files with YAML front matter</li>
+<li>Auto-converting acceptance criteria (Given/When/Then) to Jira tables</li>
+<li>Reading and updating Confluence pages</li>
+<li>Bearer token and basic authentication for Westpac Server instances</li>
+</ul>
+
+<h2>Installation</h2>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[git clone https://github.com/totaland/jira-confluence.git
+cd jira-confluence
+npm install]]></ac:plain-text-body></ac:structured-macro>
+
+<h2>Configuration</h2>
+<p>Copy <code>.env.example</code> to <code>.env</code> and configure:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[# Jira Settings
+JIRA_BASE_URL=https://jira.srv.westpac.com.au
+JIRA_AUTH_MODE=bearer
+JIRA_BEARER_TOKEN=<your-jira-pat>
+JIRA_EMAIL=<your-email>
+JIRA_ACCEPTANCE_FIELD=customfield_10201
+JIRA_DEFAULT_PROJECT=CYMATE
+
+# Confluence Settings
+CONFLUENCE_BASE_URL=https://confluence.srv.westpac.com.au
+CONFLUENCE_AUTH_MODE=bearer
+CONFLUENCE_BEARER_TOKEN=<your-confluence-pat>
+
+NODE_TLS_REJECT_UNAUTHORIZED=0]]></ac:plain-text-body></ac:structured-macro>
+
+<ac:structured-macro ac:name="note" ac:schema-version="1"><ac:rich-text-body><p>Personal Access Tokens (PAT) must be created separately for Jira and Confluence. Go to your profile settings in each application to generate tokens.</p></ac:rich-text-body></ac:structured-macro>
+
+<h2>Jira Commands</h2>
+
+<h3>Create a Jira Issue from Markdown</h3>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[node cli.js jira-create --from-markdown examples/suite-11.md]]></ac:plain-text-body></ac:structured-macro>
+
+<h3>Get a Jira Issue</h3>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[# Get issue as JSON
+node cli.js jira-get CYMATE-20 --json
+
+# Get condensed output for LLM consumption
+node cli.js jira-get CYMATE-20 --llm]]></ac:plain-text-body></ac:structured-macro>
+
+<h3>Update a Jira Issue</h3>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[node cli.js jira-update CYMATE-20 --from-markdown examples/suite-11.md]]></ac:plain-text-body></ac:structured-macro>
+
+<h3>Search Jira Issues</h3>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[# Search with JQL
+node cli.js jira-search --jql "project=CYMATE AND status='In Progress'"
+
+# Simple text search
+node cli.js jira-search --text "vulnerability" --limit 20]]></ac:plain-text-body></ac:structured-macro>
+
+<h2>Confluence Commands</h2>
+
+<h3>Read a Confluence Page</h3>
+<p>You can read pages by ID, or by space key and title:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[# Read by page ID
+node cli.js confluence-read --id 1982251142
+
+# Read by space and title
+node cli.js confluence-read --space CTENG --title "1 - Overview"
+
+# Read from a URL (extract space and title)
+# URL: https://confluence.srv.westpac.com.au/display/CTENG/2+-+Onboarding
+node cli.js confluence-read --space CTENG --title "2 - Onboarding"]]></ac:plain-text-body></ac:structured-macro>
+
+<h3>Create a Confluence Page</h3>
+<p>Create pages under a parent page using the parent's ID:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[# Create with inline body
+node cli.js confluence-create --space CTENG --title "My New Page" --parent 1994720862 --body "<p>Hello World</p>"
+
+# Create from a storage format file
+node cli.js confluence-create --space CTENG --title "My New Page" --parent 1994720862 --body-file examples/confluence/my-page.storage]]></ac:plain-text-body></ac:structured-macro>
+
+<ac:structured-macro ac:name="tip" ac:schema-version="1"><ac:rich-text-body><p>To find the parent page ID, use <code>confluence-read</code> to fetch the parent page - the ID is in the response.</p></ac:rich-text-body></ac:structured-macro>
+
+<h3>Update a Confluence Page</h3>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[# Update page title
+node cli.js confluence-update --id 2229769475 --title "New Title"
+
+# Update page body from file
+node cli.js confluence-update --id 2229769475 --body-file examples/confluence/updated-content.storage
+
+# Update both title and body
+node cli.js confluence-update --id 2229769475 --title "New Title" --body "<p>New content</p>"]]></ac:plain-text-body></ac:structured-macro>
+
+<h3>Storage Format Examples</h3>
+<p>Confluence uses "storage format" (XHTML-like) for page content. Here are common patterns:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">xml</ac:parameter><ac:plain-text-body><![CDATA[<!-- Basic formatting -->
+<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p>
+
+<!-- Headings -->
+<h2>Section Heading</h2>
+<h3>Subsection</h3>
+
+<!-- Lists -->
+<ul>
+  <li>Bullet item 1</li>
+  <li>Bullet item 2</li>
+</ul>
+
+<!-- Code block -->
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[echo "Hello World"]]]]><![CDATA[></ac:plain-text-body>
+</ac:structured-macro>
+
+<!-- Info panel -->
+<ac:structured-macro ac:name="info" ac:schema-version="1">
+  <ac:rich-text-body><p>This is an info message.</p></ac:rich-text-body>
+</ac:structured-macro>
+
+<!-- Warning panel -->
+<ac:structured-macro ac:name="warning" ac:schema-version="1">
+  <ac:rich-text-body><p>This is a warning message.</p></ac:rich-text-body>
+</ac:structured-macro>
+
+<!-- Table -->
+<table>
+  <thead><tr><th>Column 1</th><th>Column 2</th></tr></thead>
+  <tbody>
+    <tr><td>Value 1</td><td>Value 2</td></tr>
+  </tbody>
+</table>
+
+<!-- Link -->
+<a href="https://example.com">Link text</a>]]></ac:plain-text-body></ac:structured-macro>
+
+<h2>Markdown to Jira Feature</h2>
+<p>Create Jira issues from Markdown files with YAML front matter:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">yaml</ac:parameter><ac:plain-text-body><![CDATA[---
+project: CYMATE
+type: Story
+summary: Suite 11 — Sign Out Confirmation
+assignee: M060883
+priority: Medium
+epic: CYMATE-6
+labels:
+  - regression
+  - suite-11
+acceptance: |
+  - Given I am authenticated, when I click Sign out, then the confirmation page loads.
+  - Given the page is displayed, when NBA loads, then 5 items are rendered.
+---
+
+# Suite 11 Description
+Content goes here...]]></ac:plain-text-body></ac:structured-macro>
+
+<p>Acceptance criteria in <code>Given...When...Then</code> format are automatically converted to a Jira-formatted table.</p>
+
+<h2>Use with LLM Agents</h2>
+<p>This tool is designed to work with AI coding assistants like Amp. The <code>AGENTS.md</code> file provides skills that LLM agents can invoke:</p>
+<ul>
+<li><strong>create-jira-issue-from-markdown</strong> - Create issues from markdown specs</li>
+<li><strong>update-jira-issue-from-markdown</strong> - Update existing issues</li>
+<li><strong>get-jira-issue-json</strong> - Fetch issue details</li>
+<li><strong>read-confluence-page</strong> - Read page content</li>
+<li><strong>update-confluence-from-file</strong> - Update pages from files</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+
+<h3>Confluence Server vs Cloud</h3>
+<p>This tool is configured for <strong>Confluence Server/Data Center</strong> (Westpac). The key difference from Cloud is the API prefix:</p>
+<ul>
+<li><strong>Server:</strong> <code>/rest/api/content</code></li>
+<li><strong>Cloud:</strong> <code>/wiki/rest/api/content</code></li>
+</ul>
+<p>This is handled automatically in the code via <code>apiPrefix: '/rest'</code>.</p>
+
+<h3>Authentication Errors</h3>
+<ul>
+<li>Ensure you have separate PATs for Jira and Confluence</li>
+<li>Check that your token has access to the space you're trying to read/write</li>
+<li>For 401 errors, regenerate your Personal Access Token</li>
+</ul>
+
+<h2>Source Code</h2>
+<p><a href="https://github.com/totaland/jira-confluence">https://github.com/totaland/jira-confluence</a></p>

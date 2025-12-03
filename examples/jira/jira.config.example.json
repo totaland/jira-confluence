@@ -1,0 +1,20 @@
+{
+  "$schema": "./jira.config.schema.json",
+  "apiVersion": "3",
+  "defaultProject": "MYPROJECT",
+  "fieldMapping": {
+    "acceptance": "customfield_10001",
+    "epic": "customfield_10002",
+    "storyPoints": "customfield_10003",
+    "sprint": "customfield_10004"
+  },
+  "epicStringFields": ["customfield_10002"],
+  "acceptanceFieldCandidates": [
+    "customfield_10001",
+    "customfield_10100"
+  ],
+  "epicFieldCandidates": [
+    "customfield_10002",
+    "customfield_10200"
+  ]
+}
