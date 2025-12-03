@@ -90,3 +90,66 @@ bun cli.ts <command>
   node dist/cli.js jira-transition CYMATE-20 --status "Done"
   ```
   - Status names are case-insensitive (e.g., "done", "Done", "DONE" all work).
+
+
+  # Read Word Document (.docx) Skill
+
+Extract text content from Microsoft Word (.docx) files.
+
+## When to use this skill
+
+- When the user asks to read, extract, or analyze a `.docx` file
+- When the user provides a path to a Word document
+
+## How to read a .docx file
+
+Word documents are ZIP archives containing XML. Use this command to extract the text:
+
+```bash
+unzip -p "<path-to-file.docx>" word/document.xml | sed 's/<[^>]*>//g' | tr -s '[:space:]' ' '
+```
+
+### Explanation
+- `unzip -p` extracts to stdout without creating files
+- `word/document.xml` contains the main document content
+- `sed 's/<[^>]*>//g'` strips XML tags
+- `tr -s '[:space:]' ' '` normalizes whitespace
+
+## For structured output (preserving some line breaks)
+
+```bash
+unzip -p "<path-to-file.docx>" word/document.xml | sed 's/<\/w:p>/\n/g' | sed 's/<[^>]*>//g' | tr -s '[:space:]' ' '
+```
+
+This preserves paragraph breaks by converting `</w:p>` tags to newlines before stripping XML.
+
+## Limitations
+
+- Images and embedded objects are not extracted (they are in `word/media/`)
+- Complex formatting (tables, headers, footers) may not render perfectly
+- For tables, consider extracting `word/document.xml` and parsing the `<w:tbl>` elements separately
+
+## Example
+
+```bash
+# Read full document
+unzip -p "/path/to/document.docx" word/document.xml | sed 's/<[^>]*>//g' | tr -s '[:space:]' ' '
+
+# Preview first 500 characters
+unzip -p "/path/to/document.docx" word/document.xml | sed 's/<[^>]*>//g' | tr -s '[:space:]' ' ' | head -c 500
+```
+## For tables
+
+To extract and format tables from a Word document, you can use the following command:
+
+```bash
+unzip -p "<path-to-file.docx>" word/document.xml | grep -A 10 "<w:tbl>" | sed 's/<[^>]*>//g' | tr -s '[:space:]' ' '
+```
+
+This command:
+1. Extracts the document.xml file from the .docx archive
+2. Uses grep to find table elements (`<w:tbl>`) and the next 10 lines
+3. Strips XML tags
+4. Normalizes whitespace
+
+For more complex table processing, you might want to use a dedicated XML parser or a library like `python-docx` in Python.
