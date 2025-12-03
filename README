@@ -1,0 +1,34 @@
+# Jira-Confluence CLI Tool
+
+This is a command-line tool for interacting with Jira and Confluence APIs.
+
+## Setup
+
+1. **Copy environment configuration:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Get your Jira API token:**
+   - Go to [https://jira.srv.westpac.com.au/secure/ViewProfile.jspa](https://jira.srv.westpac.com.au/secure/ViewProfile.jspa)
+   - Create a personal access token
+   - Add the token to `JIRA_BEARER_TOKEN` in your `.env` file
+
+3. **Get your Confluence API token:**
+   - Go to [https://confluence.srv.westpac.com.au/plugins/personalaccesstokens/usertokens.action](https://confluence.srv.westpac.com.au/plugins/personalaccesstokens/usertokens.action)
+   - Create a personal access token
+   - Add the token to `CONFLUENCE_BEARER_TOKEN` in your `.env` file
+
+4. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+
+5. **Build the project:**
+   ```bash
+   pnpm run build
+   ```
+
+## Usage
+
+See [AGENTS.md](AGENTS.md) for detailed CLI commands and examples.
